@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JSON Table and Form</title>
+</head>
+<body>
+<h1>JSON Table</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Event Name</th>
+        <th>Event Description</th>
+    </tr>
+    </thead>
+    <tbody id="jsonTableBody">
+    <!-- Здесь будут отображаться данные JSON -->
+    </tbody>
+</table>
+
+<hr>
+
+<h1>Send JSON</h1>
+<form id="jsonForm">
+    <label for="eventName">Event Name:</label>
+    <input type="text" id="eventName" name="eventName"><br><br>
+
+    <label for="eventDescription">Event Description:</label>
+    <input type="text" id="eventDescription" name="eventDescription"><br><br>
+
+    <input type="button" value="Submit" onclick="submitJSON()">
+</form>
+
+<script>
+    function renderTable(data) {
+        var tableBody = document.getElementById("jsonTableBody");
+        tableBody.innerHTML = "";
+
+        data.forEach(function (item) {
+            var row = document.createElement("tr");
+            var cell1 = document.createElement("td");
+            var cell2 = document.createElement("td");
+
+            cell1.textContent = item.eventName;
+            cell2.textContent = item.eventDescription;
+
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+            tableBody.appendChild(row);
+        });
+    }
+
+    function fetchJSON() {
+        fetch("http://localhost:8080/events")
+            .then(response => response.json())
+            .then(data => {
+                renderTable(data);
+            })
+            .catch(error => console.error("Error fetching JSON: " + error));
+    }
+
+    function submitJSON() {
+        var eventName = document.getElementById("eventName").value;
+        var eventDescription = document.getElementById("eventDescription").value;
+
+        var formData = {
+            eventName: eventName,
+            eventDescription: eventDescription
+        };
+
+        fetch("/events", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    fetchJSON(); // После успешной отправки обновляем таблицу
+                } else {
+                    console.error("Error sending JSON.");
+                }
+            })
+            .catch(error => console.error("Error sending JSON: " + error));
+    }
+
+    // Инициируем загрузку JSON данных при загрузке страницы
+    fetchJSON();
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package repositories;
+package de.ait.hw_events_spring_boot.repositories;
 
 import java.util.List;
 
